@@ -1,7 +1,7 @@
 body{
     color: blueviolet;
     text-align: center;
-    font-family: "Arial";
+    font-family: sans-serif;
 }
 
 .container{
@@ -11,3 +11,4 @@ body{
     border: 1px solid black;
     border-radius: 20px;
 }
+
