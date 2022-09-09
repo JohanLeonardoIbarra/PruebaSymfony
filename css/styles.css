@@ -1,0 +1,13 @@
+body{
+    color: blueviolet;
+    text-align: center;
+    font-family: "Arial";
+}
+
+.container{
+    width: 40%;
+    margin-left: 50%;
+    transform: translateX(-50%);
+    border: 1px solid black;
+    border-radius: 20px;
+}
