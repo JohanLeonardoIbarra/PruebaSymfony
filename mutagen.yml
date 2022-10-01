@@ -1,0 +1,26 @@
+sync:
+  defaults:
+    mode: two-way-resolved
+    ignore:
+      paths:
+        - var
+        - vendor
+        - src
+    permissions:
+      defaultFileMode: 0666
+      defaultDirectoryMode: 0777
+  code:
+    alpha: ~/Projects/PruebaSymfony
+    beta: gopenux:~/Projects/PruebaSymfony
+  src:
+    mode: two-way-resolved
+    alpha: ~/Projects/PruebaSymfony/src
+    beta: gopenux:~/Projects/PruebaSymfony/src
+  var:
+    mode: one-way-replica
+    alpha: gopenux:~/Projects/PruebaSymfony/var
+    beta: ~/Projects/PruebaSymfony/var
+  vendor:
+    mode: one-way-replica
+    alpha: gopenux:~/Projects/PruebaSymfony/vendor
+    beta: ~/Projects/PruebaSymfony/vendor
