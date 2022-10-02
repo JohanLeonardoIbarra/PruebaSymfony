@@ -3,19 +3,24 @@
 namespace App\Repositories\User;
 
 use App\Document\User;
-use Doctrine\ODM\MongoDB\DocumentManager;
+use Doctrine\Bundle\MongoDBBundle\ManagerRegistry;
+use Doctrine\Bundle\MongoDBBundle\Repository\ServiceDocumentRepository;
 
-class UserRepository implements UserRepositoryInterface
+class UserRepository extends ServiceDocumentRepository
 {
-    private DocumentManager $documentManager;
-
-    public function __construct(DocumentManager $documentManager)
+    public function __construct(ManagerRegistry $registry)
     {
-        $this->documentManager = $documentManager;
+        parent::__construct($registry, User::class);
     }
 
-    public function findUser(string $email): User
+    public function findUserByEmail(string $email): ?User
     {
-        return $this->documentManager->getRepository(User::class)->findOneBy(["email" => $email]);
+        return $this->findOneBy(["email" => $email]);
+    }
+
+    public function createUser(User $user): void
+    {
+        $this->getDocumentManager()->persist($user);
+        $this->getDocumentManager()->flush();
     }
 }

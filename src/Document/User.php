@@ -4,9 +4,11 @@ namespace App\Document;
 
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+use Doctrine\Bundle\MongoDBBundle\Validator\Constraints\Unique;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ODM\Document]
+#[Unique("email")]
 class User implements PasswordAuthenticatedUserInterface{
     #[ODM\Id]
     private $id;
@@ -36,7 +38,7 @@ class User implements PasswordAuthenticatedUserInterface{
     private string $phone;
 
     #[ODM\Field(type: "bool")]
-    private bool $personalDataPermission;
+    private bool $personalDataPermission = false;
 
     public function getId()
     {

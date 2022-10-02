@@ -15,16 +15,17 @@ class JsonWebToken implements AuthenticationInterface
         return JWT::encode($payload, self::key, self::format);
     }
 
-    private static function decrypt(string $token): Array
+    public static function decrypt(string $token): \stdClass
     {
         return JWT::decode($token, new Key(self::key, self::format));
     }
 
     public static function verify(string $token): bool
     {
-        if (self::decrypt($token)['email']) {
+        if (self::decrypt($token)['user']) {
             return true;
         }
+
         return false;
     }
 }
