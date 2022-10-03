@@ -14,6 +14,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Messenger\MessageBus;
+use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Contracts\Service\Attribute\Required;
@@ -44,17 +45,8 @@ class UserController extends AbstractController
         $this->hasher = $hasher;
     }
 
-    #[Route('/', name: 'app_user')]
-    public function index(): JsonResponse
-    {
-        return $this->json([
-            'message' => 'Welcome to your new controller!',
-            'path' => 'src/Controller/UserController.php',
-        ]);
-    }
-
     #[Route("/", name: "app-user-create", methods: ["POST"])]
-    public function store(Request $request): JsonResponse
+    public function store(Request $request, MessageBusInterface $bus): JsonResponse
     {
         $user = new User();
         $form = $this->createForm(UserType::class, $user);
@@ -67,7 +59,7 @@ class UserController extends AbstractController
                 $hashedPassword = $this->hasher->hashPassword($user, $user->getPassword());
                 $user->setPassword($hashedPassword);
                 $this->userRepository->createUser($user);
-                //$bus->dispatch(new UserNotification($user->getEmail(), 'Te has registrado con exito!!!'));
+                $bus->dispatch(new UserNotification(email: $user->getEmail(), message: 'Te has registrado con exito!!!'));
 
                 return $this->json(null, Response::HTTP_NO_CONTENT);
             }
