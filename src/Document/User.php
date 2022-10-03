@@ -3,15 +3,13 @@
 namespace App\Document;
 
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
-use Doctrine\ODM\MongoDB\Mapping\Annotations\PreUpdate;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Doctrine\Bundle\MongoDBBundle\Validator\Constraints\Unique;
 use Symfony\Component\Validator\Constraints as Assert;
-use Doctrine\ODM\MongoDB\Events;
 
 #[ODM\Document]
 #[ODM\HasLifecycleCallbacks]
-#[Unique("email")]
+#[Unique('email')]
 class User implements PasswordAuthenticatedUserInterface{
     #[ODM\Id]
     private $id;
@@ -41,7 +39,8 @@ class User implements PasswordAuthenticatedUserInterface{
     private string $phone;
 
     #[ODM\Field(type: "bool")]
-    private bool $personalDataPermission = false;
+    #[Assert\IsTrue]
+    private bool $personalDataPermission;
 
     #[ODM\Field(type: "string")]
     private string $token;
@@ -54,7 +53,7 @@ class User implements PasswordAuthenticatedUserInterface{
     #[ODM\PrePersist]
     public function setToken(): void
     {
-        $this->token = md5($this->email);
+        $this->token = md5($this->getEmail());
     }
 
     public function getId()

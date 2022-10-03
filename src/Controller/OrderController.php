@@ -21,7 +21,7 @@ class OrderController extends AbstractController
 {
     private UserRepository $userRepository;
     private OrderRepository $orderRepository;
-    private ProductRepository $productRepository;
+    //private ProductRepository $productRepository;
 
     #[Required]
     public function setUserRepository(UserRepository $userRepository): void
@@ -35,11 +35,11 @@ class OrderController extends AbstractController
         $this->orderRepository = $orderRepository;
     }
 
-    #[Required]
-    public function setProductRepository(ProductRepository $productRepository): void
-    {
-        $this->productRepository = $productRepository;
-    }
+//    #[Required]
+//    public function setProductRepository(ProductRepository $productRepository): void
+//    {
+//        $this->productRepository = $productRepository;
+//    }
 
     #[Route('/list')]
     public function list(Request $request): JsonResponse
@@ -53,8 +53,8 @@ class OrderController extends AbstractController
         return $this->json($this->orderRepository->findBy(['token' => $token]));
     }
 
-    #[Route('/new', name: 'app-order-create', methods: ['POST'])]
-    public function create(Request $request, MessageBus $bus): JsonResponse
+    #[Route('/', name: 'app-order-create', methods: ['POST'])]
+    public function create(Request $request): JsonResponse
     {
         $token = $request->headers->get('token');
         $user = $this->userRepository->findOneBy(['token' => $token]);
@@ -64,30 +64,17 @@ class OrderController extends AbstractController
         }
 
         $order = new Order();
-        $form = $this->createForm(OrderType::class);
+        $form = $this->createForm(OrderType::class, $order);
         $form->handleRequest($request);
-        if ($form->isSubmitted()) {
-//            $productIds = $form->getData();
-//            foreach ($productIds as $productId) {
-//                $product = $this->productRepository->find($productId);
-//
-//                if ($product) {
-//                    $order->setProducts($product);
-//                }
-//            }
-//
-//            if (!$order->validateProducts()) {
-//                return $this->json(null, Response::HTTP_NOT_FOUND);
-//            }
-//
-            $order->setOwner($user)
-                ->setAddress($user->getAddress());
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $order->setOwner($user);
             $this->orderRepository->add($order);
-            $bus->dispatch(new UserNotification($user->getEmail(), 'Compra realizada con exito '.$order->__toString()));
+            //$bus->dispatch(new UserNotification($user->getEmail(), 'Compra realizada con exito '.$order->__toString()));
 
             return $this->json($order);
         }
 
-        return $this->json(null, Response::HTTP_BAD_REQUEST);
+        return $this->json($form->getErrors(true), Response::HTTP_BAD_REQUEST);
     }
 }

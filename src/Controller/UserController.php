@@ -7,7 +7,6 @@ use App\Document\User;
 use App\Form\UserLoginType;
 use App\Form\UserType;
 use App\Message\UserNotification;
-use App\Repositories\User\UserRepositoryInterface;
 use App\Repositories\UserRepository;
 use App\Utils\Auth\AuthenticationInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -54,8 +53,8 @@ class UserController extends AbstractController
         ]);
     }
 
-    #[Route("/store", name: "app-user-store", methods: ["POST"])]
-    public function store(Request $request, MessageBus $bus): JsonResponse
+    #[Route("/", name: "app-user-create", methods: ["POST"])]
+    public function store(Request $request): JsonResponse
     {
         $user = new User();
         $form = $this->createForm(UserType::class, $user);
@@ -68,7 +67,7 @@ class UserController extends AbstractController
                 $hashedPassword = $this->hasher->hashPassword($user, $user->getPassword());
                 $user->setPassword($hashedPassword);
                 $this->userRepository->createUser($user);
-                $bus->dispatch(new UserNotification($user->getEmail(), 'Te has registrado con exito!!!'));
+                //$bus->dispatch(new UserNotification($user->getEmail(), 'Te has registrado con exito!!!'));
 
                 return $this->json(null, Response::HTTP_NO_CONTENT);
             }
