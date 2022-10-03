@@ -2,37 +2,30 @@
 
 namespace App\Form;
 
-use App\Document\User;
+use App\Document\Order;
+use App\Document\Product;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use function Sodium\add;
 
-class UserType extends AbstractType
+class OrderType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('name')
-            ->add('surname')
-            ->add('email')
-            ->add('password')
-            ->add('address')
-            ->add('phone')
-            ->add('personalDataPermission')
+            ->add('products')
         ;
     }
 
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'data_class' => User::class,
             'csrf_protection' => false
         ]);
     }
 
     public function getBlockPrefix(): string
     {
-        return "";
+        return '';
     }
 }

@@ -3,20 +3,25 @@
 namespace App\Document;
 
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ODM\Document]
+#[ODM\Index(keys: ['name', 'text'])]
 class Product
 {
     #[ODM\Id]
     private $id;
 
     #[ODM\Field(type: "string")]
+    #[Assert\NotBlank]
     private string $name;
 
     #[ODM\Field(type: "int")]
+    #[Assert\Positive]
     private int $quantity;
 
     #[ODM\Field(type: "float")]
+    #[Assert\PositiveOrZero]
     private float $unitPrice;
 
     /**

@@ -6,15 +6,15 @@ namespace App\Controller;
 use App\Document\User;
 use App\Form\UserLoginType;
 use App\Form\UserType;
-use App\Repositories\User\UserRepository;
+use App\Message\UserNotification;
 use App\Repositories\User\UserRepositoryInterface;
-use App\Utils\Auth\JsonWebToken;
+use App\Repositories\UserRepository;
 use App\Utils\Auth\AuthenticationInterface;
-use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Messenger\MessageBus;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Contracts\Service\Attribute\Required;
@@ -55,7 +55,7 @@ class UserController extends AbstractController
     }
 
     #[Route("/store", name: "app-user-store", methods: ["POST"])]
-    public function store(Request $request): JsonResponse
+    public function store(Request $request, MessageBus $bus): JsonResponse
     {
         $user = new User();
         $form = $this->createForm(UserType::class, $user);
@@ -68,9 +68,9 @@ class UserController extends AbstractController
                 $hashedPassword = $this->hasher->hashPassword($user, $user->getPassword());
                 $user->setPassword($hashedPassword);
                 $this->userRepository->createUser($user);
-                $token = $this->authentication::encrypt(["user" => $user->getEmail()]);
+                $bus->dispatch(new UserNotification($user->getEmail(), 'Te has registrado con exito!!!'));
 
-                return $this->json($token);
+                return $this->json(null, Response::HTTP_NO_CONTENT);
             }
 
             return $this->json($form->getErrors(true), Response::HTTP_BAD_REQUEST);
@@ -88,15 +88,23 @@ class UserController extends AbstractController
             $userData = $form->getData();
             $user = $this->userRepository->findUserByEmail($userData['email']);
 
-            if ($this->hasher->isPasswordValid($user , $userData['password'])) {
-                $token = $this->authentication::encrypt(['user' => $user->getEmail()]);
-
-                return $this->json($token);
+            if ($user === null) {
+                return $this->json(null, Response::HTTP_NOT_FOUND);
             }
 
-            return $this->json(null, Response::HTTP_UNAUTHORIZED);
+            if ($this->hasher->isPasswordValid($user , $userData['password'])) {
+                return $this->json($user->getToken());
+            }
+
+            return $this->json(null, Response::HTTP_BAD_REQUEST);
         }
 
         return $this->json(null, Response::HTTP_BAD_REQUEST);
+    }
+
+    #[Route('/list', name: 'app-user-list', methods: ['GET'])]
+    public function list(): JsonResponse
+    {
+        return $this->json($this->userRepository->findAll());
     }
 }

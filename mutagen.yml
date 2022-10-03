@@ -9,13 +9,13 @@ sync:
       defaultFileMode: 0666
       defaultDirectoryMode: 0777
   code:
-    alpha: ~/Projects/PruebaSymfony
+    alpha: ./
     beta: gopenux:~/Projects/PruebaSymfony
   var:
     mode: one-way-replica
     alpha: gopenux:~/Projects/PruebaSymfony/var
-    beta: ~/Projects/PruebaSymfony/var
+    beta: ./var
   vendor:
     mode: one-way-replica
     alpha: gopenux:~/Projects/PruebaSymfony/vendor
-    beta: ~/Projects/PruebaSymfony/vendor
+    beta: ./vendor

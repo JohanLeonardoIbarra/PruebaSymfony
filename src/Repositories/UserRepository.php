@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Repositories\User;
+namespace App\Repositories;
 
 use App\Document\User;
 use Doctrine\Bundle\MongoDBBundle\ManagerRegistry;
@@ -15,7 +15,7 @@ class UserRepository extends ServiceDocumentRepository
 
     public function findUserByEmail(string $email): ?User
     {
-        return $this->findOneBy(["email" => $email]);
+        return $this->findOneBy(['email'=> $email]);
     }
 
     public function createUser(User $user): void
