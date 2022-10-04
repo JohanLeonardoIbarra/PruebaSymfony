@@ -20,18 +20,13 @@ class Order
     #[Assert\NotBlank(message: 'The address field is required')]
     private string $address;
 
-    #[ODM\ReferenceMany(targetDocument: Product::class)]
-    private Collection $products;
-
-    public function __toString(): string
-    {
-        return 'Address: '.$this->getAddress();
-    }
+    #[ODM\EmbedMany(targetDocument: OrderDetail::class)]
+    private Collection $orderDetails;
 
     public function __construct()
     {
         $this->address = '';
-        $this->products = new ArrayCollection();
+        $this->orderDetails = new ArrayCollection();
     }
 
     public function getId()
@@ -61,14 +56,22 @@ class Order
         return $this;
     }
 
-    public function getProducts(): Collection
+    public function getOrderDetails(): Collection
     {
-        return $this->products;
+        return $this->orderDetails;
     }
 
-    public function setProducts(Collection $products): static
+    public function addOrderDetail(OrderDetail $orderDetail): static
     {
-        $this->products = $products;
+        if (!$this->getOrderDetails()->contains($orderDetail)) {
+            $this->orderDetails->add($orderDetail);
+        }
+
         return $this;
+    }
+
+    public function removeOrderDetail(OrderDetail $orderDetail): bool
+    {
+        return $this->orderDetails->remove($orderDetail);
     }
 }

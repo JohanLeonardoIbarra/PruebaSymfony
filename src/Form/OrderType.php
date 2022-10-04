@@ -3,7 +3,6 @@
 namespace App\Form;
 
 use App\Document\Order;
-use App\Document\Product;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -15,7 +14,11 @@ class OrderType extends AbstractType
     {
         $builder
             ->add('address')
-            ->add('products')
+            ->add('orderDetails', CollectionType::class, [
+                'entry_type' => OrderDetailType::class,
+                'by_reference' => false,
+                'allow_add' => true
+            ])
         ;
     }
 

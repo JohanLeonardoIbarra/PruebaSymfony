@@ -4,16 +4,14 @@ namespace App\Controller;
 
 use App\Document\Order;
 use App\Form\OrderType;
-use App\Message\UserNotification;
 use App\Repositories\OrderRepository;
-use App\Repositories\ProductRepository;
 use App\Repositories\UserRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Messenger\MessageBus;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Contracts\Service\Attribute\Required;
 
 #[Route('/order')]
@@ -54,7 +52,7 @@ class OrderController extends AbstractController
     }
 
     #[Route('/', name: 'app-order-create', methods: ['POST'])]
-    public function create(Request $request): JsonResponse
+    public function create(Request $request, SerializerInterface $serializer): JsonResponse
     {
         $token = $request->headers->get('token');
         $user = $this->userRepository->findOneBy(['token' => $token]);

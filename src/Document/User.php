@@ -6,6 +6,7 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Doctrine\Bundle\MongoDBBundle\Validator\Constraints\Unique;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ODM\Document]
 #[ODM\HasLifecycleCallbacks]
@@ -16,26 +17,33 @@ class User implements PasswordAuthenticatedUserInterface{
 
     #[ODM\Field(type: "string")]
     #[Assert\NotBlank]
+    #[Groups(['Full'])]
     private string $name;
 
     #[ODM\Field(type: "string")]
     #[Assert\NotBlank]
+    #[Groups(['Full'])]
+
     private string $surname;
 
     #[ODM\Field(type: "string")]
     #[Assert\NotBlank]
+    #[Groups(['Full'])]
     private string $password;
 
     #[ODM\Field(type: "string")]
     #[Assert\NotBlank]
+    #[Groups(['Full'])]
     private string $address;
 
     #[ODM\Field(type: "string")]
     #[Assert\Email]
+    #[Groups(['Full', 'Order'])]
     private string $email;
 
     #[ODM\Field(type: "string")]
     #[Assert\NotBlank]
+    #[Groups(['Full'])]
     private string $phone;
 
     #[ODM\Field(type: "bool")]
@@ -43,6 +51,7 @@ class User implements PasswordAuthenticatedUserInterface{
     private bool $personalDataPermission;
 
     #[ODM\Field(type: "string")]
+    #[Groups(['Full'])]
     private string $token;
 
     public function getToken(): string
