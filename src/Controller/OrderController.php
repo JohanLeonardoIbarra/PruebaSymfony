@@ -10,6 +10,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Contracts\Service\Attribute\Required;
@@ -19,7 +20,6 @@ class OrderController extends AbstractController
 {
     private UserRepository $userRepository;
     private OrderRepository $orderRepository;
-    //private ProductRepository $productRepository;
 
     #[Required]
     public function setUserRepository(UserRepository $userRepository): void
@@ -32,12 +32,6 @@ class OrderController extends AbstractController
     {
         $this->orderRepository = $orderRepository;
     }
-
-//    #[Required]
-//    public function setProductRepository(ProductRepository $productRepository): void
-//    {
-//        $this->productRepository = $productRepository;
-//    }
 
     #[Route('/list')]
     public function list(Request $request): JsonResponse
@@ -52,7 +46,7 @@ class OrderController extends AbstractController
     }
 
     #[Route('/', name: 'app-order-create', methods: ['POST'])]
-    public function create(Request $request, SerializerInterface $serializer): JsonResponse
+    public function create(Request $request, SerializerInterface $serializer, MessageBusInterface $bus): JsonResponse
     {
         $token = $request->headers->get('token');
         $user = $this->userRepository->findOneBy(['token' => $token]);
@@ -68,7 +62,7 @@ class OrderController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $order->setOwner($user);
             $this->orderRepository->add($order);
-            //$bus->dispatch(new UserNotification($user->getEmail(), 'Compra realizada con exito '.$order->__toString()));
+            $bus->dispatch(new UserNotification($user->getEmail(), 'Compra realizada con exito '.$order->__toString()));
 
             return $this->json($order);
         }
