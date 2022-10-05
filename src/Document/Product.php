@@ -2,27 +2,36 @@
 
 namespace App\Document;
 
+use Doctrine\Bundle\MongoDBBundle\Validator\Constraints\Unique;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ODM\Document]
-#[ODM\Index(keys: ['name'=>'text'])]
+#[ODM\Index(keys: ['name' => 'text'])]
+#[Unique('name', message: 'Product name already on use')]
 class Product
 {
     #[ODM\Id]
     private $id;
 
     #[ODM\Field(type: "string")]
-    #[Assert\NotBlank]
+    #[Assert\NotBlank(message: 'Product name is required')]
     private string $name;
 
     #[ODM\Field(type: "int")]
     #[Assert\PositiveOrZero]
+    #[Assert\NotNull(message: 'Quantity is required')]
     private int $quantity;
 
     #[ODM\Field(type: "float")]
     #[Assert\PositiveOrZero]
+    #[Assert\NotNull(message: 'Unitary price is required')]
     private float $unitPrice;
+
+    public function __construct()
+    {
+        $this->name = '';
+    }
 
     public function getId()
     {

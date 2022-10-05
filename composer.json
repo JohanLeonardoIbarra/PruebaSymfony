@@ -22,6 +22,9 @@
         "symfony/flex": "^2",
         "symfony/form": "6.1.*",
         "symfony/framework-bundle": "6.1.*",
+        "symfony/http-client": "6.1.*",
+        "symfony/mailer": "6.1.*",
+        "symfony/mailjet-mailer": "6.1.*",
         "symfony/messenger": "6.1.*",
         "symfony/monolog-bundle": "^3.8",
         "symfony/property-access": "6.1.*",
@@ -31,7 +34,8 @@
         "symfony/security-bundle": "6.1.*",
         "symfony/serializer": "6.1.*",
         "symfony/validator": "6.1.*",
-        "symfony/yaml": "6.1.*"
+        "symfony/yaml": "6.1.*",
+      "ext-mongodb": "*"
     },
     "config": {
         "allow-plugins": {
@@ -82,10 +86,15 @@
     "extra": {
         "symfony": {
             "allow-contrib": false,
-            "require": "6.1.*"
+            "require": "6.1.*",
+            "docker": true
         }
     },
     "require-dev": {
-        "symfony/maker-bundle": "^1.46"
+        "phpunit/phpunit": "^9.5",
+        "symfony/browser-kit": "6.1.*",
+        "symfony/css-selector": "6.1.*",
+        "symfony/maker-bundle": "^1.46",
+        "symfony/phpunit-bridge": "^6.1"
     }
 }

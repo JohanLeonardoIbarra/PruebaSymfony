@@ -4,15 +4,15 @@ namespace App\Controller;
 
 use App\Document\Order;
 use App\Form\OrderType;
-use App\Repositories\OrderRepository;
-use App\Repositories\UserRepository;
+use App\Message\UserOrderNotification;
+use App\Repository\OrderRepository;
+use App\Repository\UserRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Contracts\Service\Attribute\Required;
 
 #[Route('/order')]
@@ -33,26 +33,14 @@ class OrderController extends AbstractController
         $this->orderRepository = $orderRepository;
     }
 
-    #[Route('/list')]
-    public function list(Request $request): JsonResponse
-    {
-        $token = $request->headers->get('token');
-
-        if (!$token) {
-            return $this->json(null, Response::HTTP_BAD_REQUEST);
-        }
-
-        return $this->json($this->orderRepository->findBy(['token' => $token]));
-    }
-
     #[Route('/', name: 'app-order-create', methods: ['POST'])]
-    public function create(Request $request, SerializerInterface $serializer, MessageBusInterface $bus): JsonResponse
+    public function create(Request $request, MessageBusInterface $bus): JsonResponse
     {
         $token = $request->headers->get('token');
         $user = $this->userRepository->findOneBy(['token' => $token]);
 
         if (!$user) {
-            return $this->json(null, Response::HTTP_UNAUTHORIZED);
+            return $this->json(null, Response::HTTP_FORBIDDEN);
         }
 
         $order = new Order();
@@ -62,9 +50,10 @@ class OrderController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $order->setOwner($user);
             $this->orderRepository->add($order);
-            $bus->dispatch(new UserNotification($user->getEmail(), 'Compra realizada con exito '.$order->__toString()));
+            $this->orderRepository->getDocumentManager()->persist($order);
+            $bus->dispatch(new UserOrderNotification($user->getEmail(), $order));
 
-            return $this->json($order);
+            return $this->json(['order' => $order->getId()]);
         }
 
         return $this->json($form->getErrors(true), Response::HTTP_BAD_REQUEST);

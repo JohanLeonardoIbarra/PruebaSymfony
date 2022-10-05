@@ -3,8 +3,9 @@
 namespace App\Controller;
 
 use App\Document\Product;
+use App\Form\ListType;
 use App\Form\ProductType;
-use App\Repositories\ProductRepository;
+use App\Repository\ProductRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -23,29 +24,23 @@ class ProductController extends AbstractController
         $this->productRepository = $productRepository;
     }
 
-    #[Route('/list', name: 'app-product-list', methods: ['GET'])]
-    public function index(Request $request): JsonResponse
+    #[Route('/list', name: 'app-product-list', methods: ['POST'])]
+    public function list(Request $request): JsonResponse
     {
-        $limit = $request->get('limit') ?: 0;
-        $offset = $request->get('offset') ?: 0;
-        $query = $request->get('q') ?: '';
-        return $this->json($this->productRepository->paginateProducts($query, $limit, $offset));
-    }
+        $defaultData = ['q' => ''];
+        $form = $this->createForm(ListType::class, $defaultData);
+        $form->handleRequest($request);
 
-    #[Route('/find/{id}', name: 'app-product-find', methods: ['GET'])]
-    public function find(string $id): JsonResponse
-    {
-        $product = $this->productRepository->find($id);
-
-        if ($product === null) {
-            return $this->json(null, Response::HTTP_NOT_FOUND);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $data = $form->getData();
+            return $this->json($this->productRepository->paginateProducts($data['q'], $data['limit']));
         }
 
-        return $this->json($product);
+        return $this->json($form->getErrors(true), Response::HTTP_BAD_REQUEST);
     }
 
-    #[Route('/new', name: 'app-product-create', methods: ['POST'])]
-    public function store(Request $request): JsonResponse
+    #[Route('/', name: 'app-product-create', methods: ['POST'])]
+    public function create(Request $request): JsonResponse
     {
         $product = new Product();
         $form = $this->createForm(ProductType::class, $product);
@@ -58,6 +53,6 @@ class ProductController extends AbstractController
             return $this->json($product);
         }
 
-        return $this->json(null, Response::HTTP_BAD_REQUEST);
+        return $this->json($form->getErrors(true), Response::HTTP_BAD_REQUEST);
     }
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Repositories;
+namespace App\Repository;
 
 use App\Document\Product;
 use Doctrine\Bundle\MongoDBBundle\ManagerRegistry;
@@ -13,20 +13,17 @@ class ProductRepository extends ServiceDocumentRepository
         parent::__construct($registry, Product::class);
     }
 
-    public function add(Product $product)
+    public function add(Product $product): void
     {
         $this->getDocumentManager()->persist($product);
         $this->getDocumentManager()->flush();
     }
 
-    public function paginateProducts(string $q, int $limit = 0, int $offset = 0)
+    public function paginateProducts(string $q, int $limit = 20)
     {
-        $qb = $this->createQueryBuilder(Product::class)
-            //->text($q) //Pendiente por revisar
-            ->limit($limit)
-            ->skip($limit*$offset);
-
-
+        $qb = $this->createQueryBuilder()
+            ->field('name')->equals(new \MongoDB\BSON\Regex("$q"))
+            ->limit($limit);
         $query = $qb->getQuery();
 
         return $query->execute();

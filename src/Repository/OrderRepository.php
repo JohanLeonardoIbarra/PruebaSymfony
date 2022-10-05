@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Repositories;
+namespace App\Repository;
 
 use App\Document\Order;
-use Doctrine\Bundle\MongoDBBundle\Repository\ServiceDocumentRepository;
 use Doctrine\Bundle\MongoDBBundle\ManagerRegistry;
+use Doctrine\Bundle\MongoDBBundle\Repository\ServiceDocumentRepository;
 
 class OrderRepository extends ServiceDocumentRepository
 {

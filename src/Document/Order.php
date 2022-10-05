@@ -18,9 +18,10 @@ class Order
 
     #[ODM\Field(type: 'string')]
     #[Assert\NotBlank(message: 'The address field is required')]
-    private string $address;
+    private ?string $address;
 
     #[ODM\EmbedMany(targetDocument: OrderDetail::class)]
+    #[Assert\Count(min: 1, minMessage: "Need choice at least one product")]
     private Collection $orderDetails;
 
     public function __construct()
@@ -50,7 +51,7 @@ class Order
         return $this->address;
     }
 
-    public function setAddress(string $address): static
+    public function setAddress(?string $address): static
     {
         $this->address = $address;
         return $this;
@@ -73,5 +74,15 @@ class Order
     public function removeOrderDetail(OrderDetail $orderDetail): bool
     {
         return $this->orderDetails->remove($orderDetail);
+    }
+
+    public function getTotal()
+    {
+        $orders = $this->orderDetails;
+        $total = 0;
+        foreach ($orders as $order){
+            $total += $order->getQuantity() * $order->getProduct()->getUnitPrice();
+        }
+        return $total;
     }
 }

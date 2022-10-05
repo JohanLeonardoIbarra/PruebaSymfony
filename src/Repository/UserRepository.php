@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Repositories;
+namespace App\Repository;
 
 use App\Document\User;
 use Doctrine\Bundle\MongoDBBundle\ManagerRegistry;

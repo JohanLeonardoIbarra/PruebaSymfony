@@ -10,7 +10,8 @@ framework:
 
         routing:
             # Route your messages to the transports
-            'App\Message\UserNotification': async
+            App\Message\UserRegisterNotification: async
+            App\Message\UserOrderNotification: async
 
 # when@test:
 #    framework:

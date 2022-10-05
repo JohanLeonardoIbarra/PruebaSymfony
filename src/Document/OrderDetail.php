@@ -3,7 +3,6 @@
 namespace App\Document;
 
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
-use Symfony\Component\Validator\Constraints as Assert;
 
 #[ODM\EmbeddedDocument]
 class OrderDetail
@@ -14,8 +13,7 @@ class OrderDetail
     #[ODM\ReferenceOne(targetDocument: Product::class)]
     private Product $product;
 
-    #[ODM\Field(type: 'string')]
-    #[Assert\Positive]
+    #[ODM\Field(type: 'int')]
     private string $quantity;
 
     public function getId(): string
