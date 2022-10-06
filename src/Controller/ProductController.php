@@ -24,11 +24,13 @@ class ProductController extends AbstractController
         $this->productRepository = $productRepository;
     }
 
-    #[Route('/list', name: 'app-product-list', methods: ['POST'])]
+    #[Route('/', name: 'app-product-list', methods: ['GET'])]
     public function list(Request $request): JsonResponse
     {
-        $defaultData = ['q' => ''];
+        $defaultData = [];
         $form = $this->createForm(ListType::class, $defaultData);
+        $request->request->replace(['q' => $request->get('q'), 'limit' => (int) $request->get('limit')]);
+        $request->setMethod('POST');
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
